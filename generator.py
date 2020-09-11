@@ -46,4 +46,4 @@ def write_docker_compose():
 def generate_conf_nginx():
     pass
 
-generate(python_version="3.5.2")
+
