@@ -46,12 +46,9 @@ def write_docker_compose():
 
 
 def generate_conf_nginx(project_name: Text,
-                        static_folder: Text,
-                        template_folder: Text):
+                        static_folder: Text):
     if static_folder is None:
         static_folder = "static"
-    if template_folder is None:
-        template_folder = "template"
     cur_dir = os.getcwd()
     Path(cur_dir + '/conf/nginx/conf.d').mkdir(parents=True, exist_ok=True)
     Path(cur_dir + '/config/nginx').mkdir(parents=True, exist_ok=True)
