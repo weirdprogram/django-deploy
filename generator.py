@@ -88,4 +88,3 @@ def generate_conf_nginx(project_name: Text,
     nginx_default.write(strings_mounting)
     return print("Success created nginx configuration")
 
-generate("lulokal_engine", "static", "3.1.1")
