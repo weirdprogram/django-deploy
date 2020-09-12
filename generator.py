@@ -64,12 +64,8 @@ def generate_conf_nginx(project_name: Text,
               '     location /{} {}\n' \
               '         alias /{}; # your Django projects static files - amend as required\n' \
               '     {}\n' \
-              '     location /{} {}\n' \
-              '         alias /{}; # your Django projects templates files - amend as required\n' \
-              '     {}\n' \
               '{}\n'.format("{", "{", project_name, "}",
                             static_folder, "{", static_folder, "}",
-                            template_folder, "{", template_folder, "}",
                             "}")
     project_conf = open("conf/nginx/conf.d/"+project_name+".conf", "w")
     project_conf.write(strings)
@@ -88,12 +84,8 @@ def generate_conf_nginx(project_name: Text,
                        '     location /{} {}\n' \
                        '         alias /{}; # your Django projects static files - amend as required\n' \
                        '     {}\n' \
-                       '     location /{} {}\n' \
-                       '         alias /{}; # your Django projects static files - amend as required\n' \
-                       '     {}\n' \
                        '{}\n'.format("{", "{", project_name, "}",
                                      static_folder, "{", static_folder, "}",
-                                     template_folder, "{", template_folder, "}",
                                      "}")
     nginx_default = open("config/nginx/"+"default.conf", "w")
     nginx_default.write(strings_mounting)
