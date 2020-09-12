@@ -3,12 +3,12 @@ from typing import Text, Optional
 import os
 
 
-def generate(#project_name: Text,
-             # static_folder: Text,
-             # template_folder: Text,
+def generate(project_name: Text,
+             static_folder: Text,
              python_version: Text,
              # dbtype: Text
              ) -> Text:
+    generate_conf_nginx(project_name, static_folder)
     write_docker_file(python_version)
     write_nginx_docker_file()
     return "Finish"
@@ -19,7 +19,7 @@ def write_docker_file(python_version: Text):
         print("Please look at https://hub.docker.io for more information about python image version")
         print("Writing Dockerfile...")
         print("Please Wait..")
-        strings = 'FROM python:%s \n' \
+        strings = 'FROM python:{} \n' \
                   'COPY . /code \n' \
                   'WORKDIR /code/ \n' \
                   'RUN pip --default-timeout=1000 install --no-cache-dir -r requirements.txt\n'.format(python_version)
@@ -87,3 +87,5 @@ def generate_conf_nginx(project_name: Text,
     nginx_default = open("config/nginx/"+"default.conf", "w")
     nginx_default.write(strings_mounting)
     return print("Success created nginx configuration")
+
+generate("lulokal_engine", "static", "3.1.1")
