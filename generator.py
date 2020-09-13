@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Text
 from jinja2 import Environment, FileSystemLoader
 
+
 import os
 
 
@@ -43,10 +44,32 @@ def write_nginx_docker_file():
         return print(e.args)
 
 
-def write_docker_compose():
-    pass
+def write_docker_compose(version: int = 3, 
+                        nginx_dockerfile: Text = 'nginx.Dockerfile',
+                        nginx_ports: list = ['0.0.0.0:443:443'],
+                        nginx_volume: list = ['./static:/var/www/static'],
+                        nginx_network_alias: list = ['acmecorp.com']
+                    ):
+    docker_compose = {}
 
+    docker_compose['version'] = version
+    docker_compose['services'] = {}
+    docker_compose['services']['nginx'] = {
+        'build': {
+            'context': '.',
+            'dockerfile': nginx_dockerfile
+        },
+        'ports': nginx_ports,
+        'networks':{
+            'default':{
+                'aliases': nginx_network_alias
+            }
+        },
+        'depends_on':['web']
+    }
+    return yaml.dump(docker_compose, default_flow_style=False)
 
+    
 def generate_conf_nginx(project_name: Text,
                         static_folder: Text) -> Text:
     if static_folder is None:
@@ -70,4 +93,7 @@ def generate_conf_nginx(project_name: Text,
     nginx_default.write(output_strings_mounting)
     message = "Success Created Nginx Configuration"
     return message
-
+  
+  
+def generate_conf_nginx():
+    pass
