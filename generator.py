@@ -1,5 +1,7 @@
 from pathlib import Path
-from typing import Text, Optional
+from typing import Text
+from jinja2 import Environment, FileSystemLoader
+
 import os
 
 
@@ -46,45 +48,26 @@ def write_docker_compose():
 
 
 def generate_conf_nginx(project_name: Text,
-                        static_folder: Text):
+                        static_folder: Text) -> Text:
     if static_folder is None:
         static_folder = "static"
     cur_dir = os.getcwd()
+    folder_loader_nginx = FileSystemLoader('templates/conf/nginx/conf.d/')
+    folder_loader_mount = FileSystemLoader('templates/config/nginx/')
+    env_nginx = Environment(loader=folder_loader_nginx)
+    env_mount = Environment(loader=folder_loader_mount)
+    template_nginx = env_nginx.get_template('nginx.conf')
+    template_mount = env_mount.get_template('default.conf')
     Path(cur_dir + '/conf/nginx/conf.d').mkdir(parents=True, exist_ok=True)
     Path(cur_dir + '/config/nginx').mkdir(parents=True, exist_ok=True)
-    strings = 'server{} \n' \
-              '     listen 80; \n' \
-              '     location / {} \n' \
-              '         proxy_pass http://{}:8000; \n' \
-              '      {} \n'\
-              '\n'\
-              '     location /{} {}\n' \
-              '         alias /{}; # your Django projects static files - amend as required\n' \
-              '     {}\n' \
-              '{}\n'.format("{", "{", project_name, "}",
-                            static_folder, "{", static_folder, "}",
-                            "}")
+    outpout_strings_nginx = template_nginx.render(project_name=project_name,
+                                                  static_folder=static_folder)
     project_conf = open("conf/nginx/conf.d/"+project_name+".conf", "w")
-    project_conf.write(strings)
-    strings_mounting = 'server{}\n' \
-                       '     listen 80;\n' \
-                       '     server_name localhost;\n' \
-                       '     location / {}\n' \
-                       '         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n' \
-                       '                   proxy_set_header X-Forwarded-Proto https;\n'\
-                       '               proxy_set_header X-Real-IP $remote_addr;\n'\
-                       '                   proxy_set_header Host $http_host;\n'\
-                       '                   proxy_redirect off;\n'\
-                       '         proxy_pass http://{}:8000;\n' \
-                       '      {}\n'\
-                       '\n'\
-                       '     location /{} {}\n' \
-                       '         alias /{}; # your Django projects static files - amend as required\n' \
-                       '     {}\n' \
-                       '{}\n'.format("{", "{", project_name, "}",
-                                     static_folder, "{", static_folder, "}",
-                                     "}")
+    project_conf.write(outpout_strings_nginx)
+    output_strings_mounting = template_mount.render(project_name=project_name,
+                                                    static_folder=static_folder)
     nginx_default = open("config/nginx/"+"default.conf", "w")
-    nginx_default.write(strings_mounting)
-    return print("Success created nginx configuration")
+    nginx_default.write(output_strings_mounting)
+    message = "Success Created Nginx Configuration"
+    return message
 
